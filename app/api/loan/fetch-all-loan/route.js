@@ -1,25 +1,25 @@
 import dbConnect from "@/lib/dbConnect";
-import UserModel from "@/model/UserModel";
+import LoanModel from "@/model/Loan";
 
 
 export const GET = async (request) => {
   await dbConnect();
 
   try {
-    const users = await UserModel.find({});
+    const loans = await LoanModel.find({});
     return Response.json(
       {
-        message: "All users fetched!",
+        message: "All loans fetched!",
         success: true,
-        users,
+        loans,
       },
       { status: 200 }
     );
   } catch (error) {
-    console.log("Error on getting user list:", error);
+    console.log("Error on getting loan list:", error);
     return Response.json(
       {
-        message: "Error on getting user list!",
+        message: "Error on getting loan list!",
         success: false,
       },
       { status: 500 }

@@ -1,57 +1,42 @@
 import dbConnect from "@/lib/dbConnect";
 import InsuranceModel from "@/model/Insurance";
+export async function POST(req) {
+  await dbConnect();
 
+  try {
+    const data = await req.json()
 
-export const POST = async (request) => {
-    await dbConnect();
-
-    try {
-        const { userid,name, mobile_no, vehicle_no, rc, rc_no, aadharcard, aadharcard_no, pan_card, pan_card_no, old_policy, old_policy_no,status } = await request.json();
-        const alreadyinsurance = await InsuranceModel.findOne({ vehicle_no });
-
-        if (alreadyinsurance) {
-            return Response.json(
-                {
-                    message: "insurance already exist with provided vehicle_no!",
-                    success: false,
-                },
-                { status: 400 }
-            );
-        }
-
-        
-        const createdInsurance = await InsuranceModel.create({
-            userid,
-            name,
-            mobile_no,
-            vehicle_no,
-            rc_no,
-            rc,
-            aadharcard_no,
-            aadharcard,
-            pan_card_no,
-            pan_card,
-            old_policy_no,
-            old_policy,
-            status
-        });
-
-        return Response.json(
-            {
-                message: "Insurance registration completed!",
-                success: true,
-                insurance: createdInsurance,
-            },
-            { status: 201 }
-        );
-    } catch (error) {
-        console.log("Error on insurance registration:", error);
-        return Response.json(
-            {
-                message: "Error on insurance registration!",
-                success: false,
-            },
-            { status: 500 }
-        );
+    const alreadyinsurance = await InsuranceModel.findOne({vehicle_no:data.vehicle_no});
+    if (alreadyinsurance) {
+      return Response.json(
+        {
+          message: "Insurance  already exist with provided Vechicle Number!",
+          success: false,
+        },
+        { status: 400 }
+      );
     }
+
+    const insurance = new InsuranceModel(data);
+
+    await insurance.save();
+
+    return Response.json(
+      {
+        message: "insurance created!",
+        success: true,
+        insurance: insurance,
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    console.log("Error on creating insurance:", error);
+    return Response.json(
+      {
+        message: "Error on creating insurance!",
+        success: false,
+      },
+      { status: 500 }
+    );
+  }
 };

@@ -1,12 +1,11 @@
 import React from 'react'
-
+import Loanform from '@/app/user/components/form/Loanform'
 export default function Loan() {
   return (
     <>
-    
-    <span className=' text-4xl font-bold'>Superadmin Loan</span>
-    
-    
+
+      <Loanform />
+
     </>
   )
 }

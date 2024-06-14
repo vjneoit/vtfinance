@@ -32,12 +32,17 @@ const AdminSchema = new Schema(
         type: Boolean,
         required:true,
         default: false
+    },
+    default:{
+        type:String,
+        required:true,
+        default:"alluser"
     }
   },
   { timestamps: true }
 );
 
 const UserModel =
-  mongoose.models.allUser || mongoose.model("allUser", AdminSchema);
+  mongoose.models.User || mongoose.model("User", AdminSchema);
 
 export default UserModel;

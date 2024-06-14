@@ -1,80 +1,69 @@
 "use client"
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
-import React from 'react'
 import { useRouter } from "next/navigation";
 import Input from "@/app/user/components/Input"
 import { signIn } from 'next-auth/react';
+import Link from 'next/link';
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const router = useRouter();
-
-  const fetchUserData = async () => {
-    try {
-      const response = await axios.get(`/api/user/find-user-byemail/${email}`);
-      setUser(response.data);
-      console.log(response.data.user_type);
-
-      if (response.data.user_type === 2) {
-        router.push('/user/dashboard/superadmin');
-      } else {
-        router.push('/user/dashboard/user');
-      }
-    } catch (error) {
-      console.error('Error fetching user:', error);
-      setLoading(false);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true); // Set loading state to true to disable inputs and show loading indicator
 
     try {
       const res = await signIn("credentials", {
         email,
         password,
         redirect: false,
-      })
+      });
 
       if (res.error) {
         setError("Invalid Credentials");
-        
+        setLoading(false); // Set loading state to false if there's an error
         return;
       }
-      setLoading(true)
-      await fetchUserData(); // Fetch user data after successful sign-in
 
+      // Fetch user data after successful sign-in
+      await fetchUserData();
     } catch (error) {
       console.log(error);
+      setLoading(false); // Set loading state to false if there's an error
     }
   };
-  if (loading) {
-    return (
-      <>
-        <div className=' h-svh w-full  flex justify-center items-center gap-4 flex-col'>
 
-          <div class="w-24 h-24 rounded-full border-4 border-blue-100 border-t-blue-500 animate-spin"></div>
-          <p className=' font-bold text-2xl text-blue-600'>Processing Please wait...</p>
-        </div>
-      </>
-    );
-  }
+  const fetchUserData = async () => {
+    try {
+      const response = await axios.get(`/api/user/find-user-byemail/${email}`);
+      console.log(response.data.user_type);
 
+      if (response.data.user_type === 2) {
+        router.push('/user/dashboard/superadmin');
+      } else if (response.data.user_type === 1) {
+        router.push('/user/dashboard/admin');
+      } else {
+        router.push('/user/dashboard/user');
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      setLoading(false); // Set loading state to false if there's an error
+    }
+  };
 
+  // Check if both email and password are not empty
+  const isFormValid = email.trim() !== '' && password.trim() !== '';
 
   return (
-    <>
-      <div className="container mx-auto py-6 ">
-        <div className=' lg:w-2/4 md:w-2/3 mx-auto px-6'>
-          <h1 className="text-5xl text-center  font-extrabold text-red-500 mb-8">
-            Login
-          </h1>
+    <div className="bghome">
+      <div className="min-h-screen bg-gradient-to-r from-orange-500/10 via-blue-900/70 to-blue-800/75 flex justify-center lg:justify-end">
+        <div className="bg-white rounded-2xl p-10 lg:w-1/3 md:2/5 shadow-2xl flex flex-col justify-center">
+          <h1 className='text-3xl font-bold mb-5 underline text-blue-950'>Login</h1>
           <form onSubmit={handleSubmit} action="" method='post' encType="multipart/form-data">
             <Input
               label="Email"
@@ -82,8 +71,10 @@ export default function Login() {
               name="email"
               id="email"
               placeholder="Email"
-              className="p-2 mb-4 border-b w-full focus:outline-none focus:border-red-500"
+              className="p-2 mb-4 border-b w-full focus:outline-none focus:border-blue-950"
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={loading} // Disable input if loading
             />
             <Input
               label="Password"
@@ -91,24 +82,27 @@ export default function Login() {
               name="password"
               id="password"
               placeholder="Password"
-              className="p-2 mb-4 border-b w-full focus:outline-none focus:border-red-500"
+              className="p-2 mb-4 border-b w-full focus:outline-none focus:border-blue-950"
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
+              disabled={loading} // Disable input if loading
             />
             {error && (
-              <div className=' bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md mt-2'>
+              <div className='bg-red-500 text-white w-fit text-sm py-1 px-3 rounded-md my-2'>
                 {error}
               </div>
             )}
             <button
               type='submit'
-              className='w-full bg-red-500 text-white rounded-md py-1.5 hover:bg-red-700 mt-4'
+              className={`bg-blue-950 text-white font-medium px-6 py-2 rounded-xl text-lg w-full hover:bg-white hover:text-blue-950 border border-blue-950 duration-150 ${!isFormValid || loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={!isFormValid || loading} // Disable button if form is invalid or loading
             >
-               Submit
-              
+              {loading ? 'Processing...' : 'Submit'}
             </button>
           </form>
+          <span className='text-sm font-medium text-gray-600 my-5'> Don&apos;t Have an account? <Link href="/user/create" className='text-blue-950 underline'> Click here to create one</Link></span>
         </div>
       </div>
-    </>
-  );
+    </div>
+  );
 }

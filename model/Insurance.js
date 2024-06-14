@@ -57,12 +57,21 @@ const InsuranceSchema = new Schema(
         type:Boolean,
         required:true,
         default: false
-    }
+    },
+    default:{
+        type:String,
+        required:true,
+        default:"allinsurance"
+    },
+    other: {
+        type: [String], // storing file paths
+        
+    },
   },
   { timestamps: true }
 );
 
 const InsuranceModel =
-  mongoose.models.insuranceinfo || mongoose.model("insuranceinfo", InsuranceSchema);
+  mongoose.models.allinsurance || mongoose.model("allinsurance", InsuranceSchema);
 
 export default InsuranceModel;

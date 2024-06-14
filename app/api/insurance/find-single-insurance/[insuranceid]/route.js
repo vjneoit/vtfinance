@@ -6,10 +6,7 @@ export const GET = async (request, context) => {
   await dbConnect();
 
   try {
-    // Extract insurance ID from query parameters
     const insuranceid = context.params.insuranceid;
-
-    // Find the insurance by ID
     const insurance = await InsuranceModel.findById(insuranceid);
 
     if (!insurance) {
@@ -23,10 +20,10 @@ export const GET = async (request, context) => {
     }
 
     return Response.json(
-     
-      
-        insurance,
-    
+
+
+      insurance,
+
       { status: 200 }
     );
   } catch (error) {

@@ -11,7 +11,7 @@ export default function Input({label, type, name, id, ...props }) {
                     name={name}
                     id={id}
                     autoComplete='off'
-                    className='w-full   border-b border-gray-300  focus:outline-none focus:border-red-500 mb-4'
+                    className='w-full   border-b border-gray-300  focus:outline-none focus:border-blue-500 mb-4'
                     {...props}
                 />
             </div>
